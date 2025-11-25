@@ -1,6 +1,5 @@
 -- Некоторые факты - для использования в других модулях
 import SigmaProgramming.Defs
-import SigmaProgramming.Axioms
 
 namespace SigmaProg
 variable [m : SMModel]
@@ -28,7 +27,15 @@ theorem iniseg_len_cons (h : xs ⊑ tl) : ‖xs‖ < ‖cons tl hd‖ := by
 
 theorem elem_head_cons : hd ∈ list (cons tl hd) := .here
 theorem elem_cons_head (x : SM) (nnil : nonNil x) : head x ∈ list x := by
-  rw [← Ax_list3 nnil]; exact .here
+  cases x
+  · trivial
+  · exact .here
+
+-- теоремы о конкатенации
+
+theorem conc_nil : ∀ y ys, conc .nil ys = ys → conc .nil (cons ys y) = cons ys y := by
+    intro y ys eq
+    cases y <;> rw [conc,eq]
 
 -- теоремы о начальных сегментах
 
@@ -63,8 +70,10 @@ theorem iniseg_tail : (cons xs xh ⊑ cons ys yh) → xs ⊑ ys := by
 
 -- Свойства отношения ⊑
 
-def refl : xs ⊑ xs := .nn
+-- рефлексивность
+theorem refl : xs ⊑ xs := .nn
 
+-- антисимметричность
 theorem asymm (hxy : x ⊑ y) (hyx : y ⊑ x) : x = y := by
   have len_eq : ‖x‖ = ‖y‖ := iniseg_len_eq hxy hyx
   induction hyx with
@@ -79,6 +88,7 @@ theorem asymm (hxy : x ⊑ y) (hyx : y ⊑ x) : x = y := by
       exact this
     exact False.elim this
 
+-- транзитивность
 theorem trans  (hxy : xs ⊑ ys) (hyz : ys ⊑ zs) : (xs ⊑ zs) := by
   match hyz with
   | .nn => exact hxy

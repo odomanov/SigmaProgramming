@@ -1,5 +1,6 @@
 --== Аксиомы ==--
 import SigmaProgramming.Defs
+import SigmaProgramming.Facts
 import SigmaProgramming.ElemWF
 
 namespace SigmaProg
@@ -28,9 +29,6 @@ theorem Ax_list7 : ∀ a b c, conc (conc a b) c = conc a (conc b c) := by
   | cons _ hd ih =>
     rw [conc,conc,conc]
     exact congrFun (congrArg cons ih) hd
-theorem conc_nil : ∀ y ys, conc .nil ys = ys → conc .nil (cons ys y) = cons ys y := by
-    intro y ys eq
-    cases y <;> rw [conc,eq]
 theorem Ax_list8 : conc nil xs = xs :=
   match xs with
   | .nil => rfl
