@@ -3,9 +3,10 @@ Type-theoretical partial formalization of Σ-programming theory in Lean 4.
 See: Goncharov, S.S.; Sviridenko, D.I. Σ-programming. Transl. II Ser. Am. Math. Soc. 1989,142, 101–121.
 
 + [[SigmaProgramming/Defs.lean][Defs]] — Основные определения.
-+ [[SigmaProgramming/Axioms.lean][Axioms]] — Доказательства аксиом из статьи.
++ [[SigmaProgramming/Axioms.lean][Axioms]] — Доказательства аксиом из статьи.  Часть аксиом вынесена в
+  отдельные файлы:
+  - [[SigmaProgramming/Ax_equality_of_capacity.lean][Ax_equality_of_capacity]] — Доказательство Аксиомы равнообъёмности.
+  - [[SigmaProgramming/Ax_d0_choice.lean][Ax_d0_choice]] — Доказательство Аксиомы Δ₀-выборки.
+  - [[SigmaProgramming/Ax_d0_separation.lean][Ax_d0_separation]] — Доказательство Аксиомы Δ₀-выделения.
 + [[SigmaProgramming/Facts.lean][Facts]] — Некоторые факты.
-+ [[SigmaProgramming/Ax_equality_of_capacity.lean][Defs]] — Доказательство
-  Axiom of equality of capacity.
-+ [[SigmaProgramming/ElemWF.lean][ElemWF]] — Доказательство фундированности
-  отношения принадлежности.
++ [[SigmaProgramming/ElemWF.lean][ElemWF]] — Доказательство фундированности отношения принадлежности.

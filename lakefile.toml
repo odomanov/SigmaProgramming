@@ -1,5 +1,9 @@
 name = "SigmaProgramming"
-version = "0.1.0"
+version = "1.0.0"
+
+[[require]]
+name = "mathlib"
+path = "D:/git/mathlib4"
 
 [[lean_lib]]
 name = "SigmaProgramming"
