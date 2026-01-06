@@ -7,8 +7,10 @@ variable [m : SModel]
 open S SM
 
 -- для любой δ существует пара γ, в которой δ будет первым элементом
-theorem inisegβ (ish : isHLF pl)
-  : ∀ δ, (δ ⊑ ish.getβ) → ∃ γ, γ ∈ pl.s ∧ ∃ ε, ⦅δ,ε⦆ = γ := by
+theorem LF_cond1 (ish : isHLF pl)
+  : ∀ δ, (δ ⊑ ish.getβ) → ∃ γ, (γ ∈ ish.getα) ∧ (∃ ε, ⦅δ,ε⦆ = γ) := by
+  have getα_eq : ish.getα = pl.s := by trivial
+  rw [getα_eq]
   induction hi : ish with
   -- β = nil, δ = nil
   | nil =>
@@ -33,7 +35,7 @@ theorem inisegβ (ish : isHLF pl)
       have h_eq : (ish'.getβ ∷ a) = (tl ∷ hd) := by assumption
       injection h_eq with h_tl h_hd
       rw [← h_tl] at ini'
-      obtain ⟨γ, hmem, ⟨ε, heq⟩⟩ := ih ish' rfl δ ini'
+      obtain ⟨γ, hmem, ⟨ε, heq⟩⟩ := ih ish' rfl rfl δ ini'
       exact ⟨γ,.there hmem, ⟨ε, heq⟩⟩
 
   -- структура док-ва та же, что и для cons
@@ -52,10 +54,10 @@ theorem inisegβ (ish : isHLF pl)
       have h_eq : (ish'.getβ ∷ a) = (tl ∷ hd) := by assumption
       injection h_eq with h_tl h_hd
       rw [← h_tl] at ini'
-      obtain ⟨γ, hmem, ⟨ε, heq⟩⟩ := ih ish' rfl δ ini'
+      obtain ⟨γ, hmem, ⟨ε, heq⟩⟩ := ih ish' rfl rfl δ ini'
       exact ⟨γ,.there hmem, ⟨ε, heq⟩⟩
 
-theorem order (ish : isHLF pl) : ∀ (αₚ' αₚ'' : PL),
+theorem LF_cond2 (ish : isHLF pl) : ∀ (αₚ' αₚ'' : PL),
   (αₚ' ⊑ pl) → (αₚ'' ⊑ αₚ')
   → ∃ δ' δ'', (δ' = αₚ'.fst) ∧ (δ'' = αₚ''.fst) ∧ (δ'' ⊑ δ')
     ∧ (αₚ' ≠ αₚ'' ↔ δ' ≠ δ'') := by

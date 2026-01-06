@@ -45,8 +45,8 @@ def S.tail : S → S
 -- конкатенация
 @[simp]
 def S.conc : S → S → S
-| αs, nil => αs
-| αs, cons βs β => cons (conc αs βs) β
+| α, nil => α
+| α, cons β b => cons (conc α β) b
 
 -- длина списка
 @[simp]
@@ -58,8 +58,8 @@ notation:max (priority := high) "‖" α "‖" => S.len α
 
 -- предикат принадлежности для Membership
 inductive SM.Mem : SM → SM → Prop where
-| here : ∀ {α} {αs}, Mem α (list (αs ∷ α))
-| there : ∀ {α} {αs} {β}, Mem α (list αs) → Mem α (list (αs ∷ β))
+| here : ∀ {a} {α}, Mem a (list (α ∷ a))
+| there : ∀ {a} {α} {b}, Mem a (list α) → Mem a (list (α ∷ b))
 
 scoped instance : Membership SM SM where
   mem := λ α β => SM.Mem β α
@@ -82,8 +82,8 @@ def S.conv : S → List SM
 
 -- начальный сегмент
 inductive S.iniseg  : S → S → Prop where
-| irefl : ∀ {αs}, iniseg αs αs
-| icons : ∀ {αs} (tl : S) (hd : SM), iniseg αs tl → iniseg αs (tl ∷ hd)
+| irefl : ∀ {α}, iniseg α α
+| icons : ∀ {α} (tl : S) (hd : SM), iniseg α tl → iniseg α (tl ∷ hd)
 
 scoped notation:min α " ⊑ " β => S.iniseg α β
 
@@ -203,6 +203,10 @@ def HLF.conv_list (hlf : HLF) : List SM := hlf.pl.s.conv
 
 @[simp]
 def isHLF.getα {pl : PL} (_ : isHLF pl) : S := pl.s
+@[simp]
+def HLF.getα (x : HLF) : S := x.pl.s
 
 @[simp]
 def isHLF.getβ {pl : PL} (_ : isHLF pl) : S := pl.fst
+@[simp]
+def HLF.getβ (x : HLF) : S := x.pl.fst

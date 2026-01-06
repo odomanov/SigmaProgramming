@@ -12,7 +12,7 @@ def S.induction {motive : S → Sort u}
   (cons : (tl : S) → (hd : SM) → motive tl → motive (tl ∷ hd))
   : (x : S) → motive x
     | .nil => nil
-    | .cons tl hd => cons tl hd (S.induction nil cons tl)
+    | .cons tl hd => cons tl hd (induction nil cons tl)
 
 @[induction_eliminator]
 def SM.induction {motive : SM → Sort u}
@@ -24,8 +24,8 @@ def SM.induction {motive : SM → Sort u}
     | .atom a => atom a
     | .list nil => listn
     | .list (tl ∷ hd) =>
-      listc tl hd (SM.induction atom listn listc (list tl))
-      (SM.induction atom listn listc hd)
+      listc tl hd (induction atom listn listc (list tl))
+                  (induction atom listn listc hd)
 
 theorem mem_wf : WellFounded Mem := by
   constructor

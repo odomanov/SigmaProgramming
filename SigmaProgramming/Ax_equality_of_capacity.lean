@@ -7,26 +7,26 @@ namespace GES
 variable [m : SModel]
 open S SM
 
--- информация о начальном сегменте sm
-structure iniseg_info (sm : S) where
+-- информация о начальном сегменте α
+structure iniseg_info (α : S) where
   tl : S
   hd : SM
-  pi : tl ∷ hd ⊑ sm
-  pe : hd ∈ list sm
+  pi : tl ∷ hd ⊑ α
+  pe : hd ∈ list α
 
--- извлечение первой головы после ism; поэтому ii.tl = ism
-def getδ (sm ism : S)
-  (tl0 : S) (hd0 : SM) (pi0 : tl0 ∷ hd0 ⊑ sm) (pe0 : hd0 ∈ list sm)
-  (pi : ism ⊑ tl0) :
-  ∃ (ii : iniseg_info sm), ii.tl = ism :=
+-- извлечение первой головы после β; поэтому ii.tl = β
+def getδ (α β : S)
+  (tl₀ : S) (hd₀ : SM) (pi₀ : tl₀ ∷ hd₀ ⊑ α) (pe₀ : hd₀ ∈ list α)
+  (pi : β ⊑ tl₀) :
+  ∃ (ii : iniseg_info α), ii.tl = β :=
   match p : pi with
   | .irefl =>
-    have h : tl0 = ism := by assumption
-    ⟨⟨tl0, hd0, h ▸ pi0, pe0⟩, h⟩
-  | .icons (tl:=tl0') hd0' pi' =>
-    have pi0' : tl0' ∷ hd0' ⊑ sm := iniseg_cons pi0
-    have pe0' : hd0' ∈ list sm := iniseg_elem_head pi0'
-    getδ sm ism tl0' hd0' pi0' pe0' pi'
+    have h : tl₀ = β := by assumption
+    ⟨⟨tl₀, hd₀, h ▸ pi₀, pe₀⟩, h⟩
+  | .icons (tl:=tl₀') hd₀' pi' =>
+    have pi₀' : tl₀' ∷ hd₀' ⊑ α := iniseg_cons pi₀
+    have pe₀' : hd₀' ∈ list α := iniseg_elem_head pi₀'
+    getδ α β tl₀' hd₀' pi₀' pe₀' pi'
 
 --== Собственно, доказательство ==--
 
