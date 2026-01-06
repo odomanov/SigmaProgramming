@@ -20,9 +20,8 @@ theorem iniseg_len_eq {α β : S} (hαβ : α ⊑ β) (hβα : β ⊑ α) : ‖�
   Nat.le_antisymm hαβ_len hβα_len
 -- cons увеличивает длину
 theorem len_cons (tl : S) (hd : SM) : ‖cons tl hd‖ = ‖tl‖ + 1 := rfl
-theorem iniseg_len_cons {αs tl : S} {hd : SM} (h : αs ⊑ tl) : ‖αs‖ < ‖cons tl hd‖ := by
-  have := iniseg_len_le h
-  simpa using Nat.lt_succ_of_le this
+theorem iniseg_len_cons {α tl : S} {hd : SM} (h : α ⊑ tl) : ‖α‖ < ‖cons tl hd‖ := by
+  simpa using Nat.lt_succ_of_le (iniseg_len_le h)
 theorem len_neq {α β : S} : ‖α‖ ≠ ‖β‖ → α ≠ β := by
   contrapose; intro h; congr
 
@@ -30,9 +29,7 @@ theorem len_neq {α β : S} : ‖α‖ ≠ ‖β‖ → α ≠ β := by
 
 theorem elem_head_cons : hd ∈ list (cons tl hd) := .here
 theorem elem_cons_head (α : S) (nnil : α ≠ nil) : head α ∈ list α := by
-  cases α
-  · trivial
-  · exact .here
+  cases α; trivial; exact .here
 
 theorem elem_nil : ∀ (β : SM), ¬ Mem β (list nil) := by intro _ _; trivial
 
@@ -78,10 +75,10 @@ theorem iniseg_cons_right {α tl : S} {hd : SM} : (α ⊑ tl) → (α ⊑ cons t
 -- Свойства отношения ⊑
 
 -- рефлексивность
-theorem refl {α : S} : α ⊑ α := .irefl
+theorem iniseg_refl {α : S} : α ⊑ α := .irefl
 
 -- антисимметричность
-theorem asymm {α β : S} (hαβ : α ⊑ β) (hβα : β ⊑ α) : α = β := by
+theorem iniseg_asymm {α β : S} (hαβ : α ⊑ β) (hβα : β ⊑ α) : α = β := by
   have len_eq : ‖α‖ = ‖β‖ := iniseg_len_eq hαβ hβα
   induction hβα with
   | irefl => rfl
@@ -95,13 +92,13 @@ theorem asymm {α β : S} (hαβ : α ⊑ β) (hβα : β ⊑ α) : α = β := b
     contradiction
 
 -- транзитивность
-theorem iniseg.trans {α β γ : S} (hαβ : α ⊑ β) (hβγ : β ⊑ γ) : (α ⊑ γ) := by
+theorem iniseg_trans {α β γ : S} (hαβ : α ⊑ β) (hβγ : β ⊑ γ) : (α ⊑ γ) := by
   match hβγ with
   | .irefl => exact hαβ
-  | .icons _ _ hβγ' => exact .icons _ _ (trans hαβ hβγ')
+  | .icons _ _ hβγ' => exact .icons _ _ (iniseg_trans hαβ hβγ')
 
 -- полнота (для нач.сегментов одного списка X)
-theorem compl {X α β : S} : (α ⊑ X) → (β ⊑ X) → (α ⊑ β) ∨ (β ⊑ α) := by
+theorem iniseg_compl {X α β : S} : (α ⊑ X) → (β ⊑ X) → (α ⊑ β) ∨ (β ⊑ α) := by
   intro hα hβ
   induction hαeq : hα with
   | irefl => exact Or.inr hβ
@@ -111,8 +108,8 @@ theorem compl {X α β : S} : (α ⊑ X) → (β ⊑ X) → (α ⊑ β) ∨ (β 
     | icons _ hd' p' => exact ih p p' rfl
 
 -- другая формулировка
-theorem compl' : ∀ (αs βs : segs X), (αs.s ⊑ βs.s) ∨ (βs.s ⊑ αs.s) :=
-  λ αs βs => compl αs.is_seg βs.is_seg
+theorem iniseg_compl' : ∀ (αs βs : segs X), (αs.s ⊑ βs.s) ∨ (βs.s ⊑ αs.s) :=
+  λ αs βs => iniseg_compl αs.is_seg βs.is_seg
 
 -- свойства HLF
 
@@ -124,6 +121,7 @@ theorem hlf_nonnil (hlf : HLF) : hlf.s ≠ .nil := by
   | cons p' _ _ => simp
   | pass p' _ => simp
 
+-- TODO
 theorem mem_hlf_s : ∀ (hlf : HLF), x ∈ hlf → x ∈ hlf.s
   | _, .elnil => .here
   | _, .herec => .here
@@ -134,14 +132,14 @@ theorem mem_hlf_s : ∀ (hlf : HLF), x ∈ hlf → x ∈ hlf.s
 -- PL не может быть пуст
 theorem PL_nnil : ∀ pl : PL, pl.s ≠ nil := nofun
 
-theorem iniseg.nil_all : ∀ (α : S), nil ⊑ α
+theorem iniseg_nil_all : ∀ (α : S), nil ⊑ α
 | nil => .irefl
-| cons tl _ => .icons _ _ (nil_all tl)
+| cons tl _ => .icons _ _ (iniseg_nil_all tl)
 
 theorem isPL_of_last (p : isPL (s ∷ s₁ ∷ x)) : isPL (s ∷ s₁) := by
   cases p; assumption
 
-theorem PL.s_eq_eqv {α β : PL} : α.s = β.s ↔ α = β := by
+theorem PL_s_eq_eqv {α β : PL} : α.s = β.s ↔ α = β := by
   constructor
   · generalize hb : β.s = y
     intro h
@@ -150,21 +148,21 @@ theorem PL.s_eq_eqv {α β : PL} : α.s = β.s ↔ α = β := by
       congr; simp at hb; exact hb.symm
   · intro h; congr
 
-theorem PL.s_neq_eqv {α β : PL} : α.s ≠ β.s ↔ α ≠ β := by
+theorem PL_s_neq_eqv {α β : PL} : α.s ≠ β.s ↔ α ≠ β := by
   constructor
   · generalize hb : β.s = y
     intro h hh
     induction hh with
     | refl => cases α with | mk _ _ => cases β with | mk _ _ =>
       contradiction
-  · intro h hh; have := PL.s_eq_eqv.mp hh; contradiction
+  · intro h hh; have := PL_s_eq_eqv.mp hh; contradiction
 
-lemma PL.len_ge_1 (α : PL) : 1 ≤ α.len := by
+lemma PL_len_ge_1 (α : PL) : 1 ≤ α.len := by
   match α with
   | ⟨_,.singl _ _⟩ => simp [PL.len]
   | ⟨_,.cons _ _ _⟩ => simp [PL.len]
 
-theorem PL.s_iniseg {α β : PL} : (α ⊑ β) ↔ (α.s ⊑ β.s) := by
+theorem PL_iniseg_s {α β : PL} : (α ⊑ β) ↔ (α.s ⊑ β.s) := by
   constructor
   · intro h; induction h with
     | irefl => exact .irefl
@@ -173,7 +171,7 @@ theorem PL.s_iniseg {α β : PL} : (α ⊑ β) ↔ (α.s ⊑ β.s) := by
     generalize hb : β.s = y
     rw [hb] at h
     induction hh : h generalizing β with
-    | irefl => exact PL.s_eq_eqv.mp hb.symm ▸ .irefl
+    | irefl => exact PL_s_eq_eqv.mp hb.symm ▸ .irefl
     | icons tl hd ini ih => cases hβ : β with | mk βs βp =>
       revert βp
       generalize hgen : βs = x
@@ -186,8 +184,8 @@ theorem PL.s_iniseg {α β : PL} : (α ⊑ β) ↔ (α.s ⊑ β.s) := by
         rw [←tl_nil] at ini
         have le : ‖α.s‖ ≤ ‖nil‖ := iniseg_len_le ini
         simp [S.len] at le
-        have ge : 1 ≤ ‖α.s‖ := PL.len_ge_1 α
-        linarith
+        -- have ge : 1 ≤ ‖α.s‖ := PL.len_ge_1 α
+        -- linarith
       | cons prev_p α₁ α₂ =>
         rename_i α' α₁' α₂'
         have hhh := βeq ▸ hb
@@ -196,34 +194,34 @@ theorem PL.s_iniseg {α β : PL} : (α ⊑ β) ↔ (α.s ⊑ β.s) := by
         let β' : PL := ⟨tl, tl_eq ▸ prev_p⟩
         have sub_ini : α ⊑ β' := ih (β:=β') ini rfl rfl
         subst β'; subst tl_eq
-        exact inisegPL.icons α' α₁' α₂' prev_p sub_ini α₁ α₂
+        exact .icons α' α₁' α₂' prev_p sub_ini α₁ α₂
 
 -- = PL.fst !
-theorem PL.get_fst
-  : ({ s := _ ∷ ⦅α₁,α₂⦆, is_pl := p ∷ ⦅α₁,_⦆ } : PL).fst = α₁ := by
-  dsimp [PL.fst]
+-- theorem PL.get_fst
+--   : ({ s := _ ∷ ⦅α₁,α₂⦆, is_pl := p ∷ ⦅α₁,_⦆ } : PL).fst = α₁ := by
+--   dsimp [PL.fst]
 
-theorem inisegPL_cons {α α₁ α₂ : S} {pl : PL} {p : isPL (α ∷ ⦅α₁',α₂'⦆)}
+theorem PL_iniseg_cons {α α₁ α₂ : S} {pl : PL} {p : isPL (α ∷ ⦅α₁',α₂'⦆)}
   : (⟨_, .cons p α₁ α₂⟩ ⊑ pl) → (⟨_,p⟩ ⊑ pl) := by
   intro ini
   cases ini with
   | irefl => exact .icons _ _ _ _ .irefl _ _
-  | icons _ _ _ _ ini' _ _ => exact .icons _ _ _ _ (inisegPL_cons ini') _ _
+  | icons _ _ _ _ ini' _ _ => exact .icons _ _ _ _ (PL_iniseg_cons ini') _ _
 
-theorem isPL.inner : isPL (α ∷ hd1 ∷ hd2) → isPL (α ∷ hd1) := by
+theorem isPL_inner : isPL (α ∷ hd1 ∷ hd2) → isPL (α ∷ hd1) := by
   intro h; cases h; assumption
 
-theorem inisegPL.trans {α β γ : PL} (ini1 : α ⊑ β) (ini2 : β ⊑ γ) : α ⊑ γ := by
+theorem PL_iniseg_trans {α β γ : PL} (ini1 : α ⊑ β) (ini2 : β ⊑ γ) : α ⊑ γ := by
   induction ini2 with
   | irefl => exact ini1
-  | icons _ _ _ ini' _ _ _ ih => exact inisegPL.icons _ _ _ ini' (ih ini1) _ _
+  | icons _ _ _ ini' _ _ _ ih => exact .icons _ _ _ ini' (ih ini1) _ _
 
 -- Лемма: Приращение в HLF всегда сохраняет iniseg для компонентов
-theorem isHLF.step_mono {p : isPL (α ∷ ⦅α₁', α₂'⦆ ∷ ⦅α₁, α₂⦆)}
+theorem isHLF_step_mono {p : isPL (α ∷ ⦅α₁', α₂'⦆ ∷ ⦅α₁, α₂⦆)}
   (ish : isHLF ⟨_, p⟩) : α₁' ⊑ α₁ := by
   cases ish with
-  | cons _ _ _ => exact .icons α₁' _ .irefl
-  | pass _ _ => exact .icons α₁' _ .irefl
+  | cons _ _ _ => exact .icons _ _ .irefl
+  | pass _ _ => exact .icons _ _ .irefl
 
 -- Лемма: если префикс плавно растет до pl по правилам isHLF,
 -- то его fst является префиксом для fst итогового pl.
@@ -291,29 +289,46 @@ theorem isHLF.step_mono {p : isPL (α ∷ ⦅α₁', α₂'⦆ ∷ ⦅α₁, α�
 --   (α' ⊑ pl) → (α'' ⊑ α') → (α''.fst ⊑ α'.fst)
 --   := sorry
 
-theorem PL_trans {pl α' α'' : PL} (ini'' : α'' ⊑ α') (ini' : α' ⊑ pl) : (α'' ⊑ pl) := by
-  induction ini' with
-  | irefl => exact ini''
-  | icons _ _ _ _ _ _ _ ih => exact inisegPL.icons _ _ _ _ (ih ini'') _ _
-
 -- префикс HLF списка также является HLF
 theorem isHLF_iniseg {α β : PL} (h : α ⊑ β) (ish : isHLF β) : isHLF α := by
   induction hh : h with
   | irefl => exact ish
   | icons tl α₁' α₂' p ini α₁ α₂ ih =>
     cases hi : ish with
-    | cons ish_prev => exact ih ini ish_prev rfl
+    | cons ish_prev a b =>
+      -- rename_i p_prev
+      -- have hlf_prev : HLF := ⟨p_prev, ish_prev⟩
+      -- have (eq:=pl_prev_eq) pl_prev : PL :=
+      --   ⟨hlf_prev.base ∷ ⦅hlf_prev.fst, hlf_prev.snd⦆, PL_eta hlf_prev.pl ▸ hlf_prev.pl.is_pl⟩
+      -- have eq_pl : hlf_prev.pl = pl_prev := pl_prev_eq ▸ HLF_eta' hlf_prev
+      -- have ppp : p_prev = { s := p_prev.base ∷ list (p_prev.fst.ORDPAIR p_prev.snd), is_pl := p } := by
+      --   have := HLF_eta' hlf_prev
+      --   simp [*] at this
+      -- -- have hlf_pl : hlf_prev.pl = p_prev := by simp_all --[HLF.pl]
+      -- -- have eq_pl' : p_prev = pl_prev := hlf_pl.symm ▸ eq_pl
+      -- -- have ish_prev' : isHLF pl_prev := sorry -- eq_pl.symm ▸ ish_prev
+      -- have ish_prev' :  isHLF { s := p_prev.base ∷ list (p_prev.fst.ORDPAIR p_prev.snd), is_pl := p } :=
+      --   ppp ▸ ish_prev
+      exact ih ini ish_prev rfl
     | pass ish_prev => exact ih ini ish_prev rfl
 
 -- theorem PL_iniseg (ish : isHLF pl) :
 --   ∀ (αₚ' αₚ'' : PL), (αₚ' ⊑ pl) → (αₚ'' ⊑ αₚ') → (αₚ''.fst ⊑ αₚ'.fst) := by
 --   intro αₚ' αₚ'' ini' ini''
+--   induction h'' : ini'' with
+--   | irefl => exact .irefl
+--   | icons _ _ _ _ ini1 _ _ ih =>
+--     cases h' : ini' with
+--     | irefl => simp;
+--     | icons _ _ _ _ ini1' _ _ => _
+--     have := ih ini1
+
 --   match ha' : αₚ', ha'' : αₚ'', hini'' : ini'' with
 --   | _, _, .irefl => exact .irefl
 --   | _, ⟨α₂ ∷ ⦅hd1,hd2⦆,p₂⟩, .icons α' α₁' α₂' ini1 _ _ _ =>
 --     -- have p' : isPL α' := by assumption
 --     expose_names
---     have ini2 : ⟨α',_⟩ ⊑ pl := inisegPL_cons ini'
+--     have ini2 : ⟨α',_⟩ ⊑ pl := PL_iniseg_cons ini'
 --     -- have p' : isPL (α' ∷ ⦅α₁',α₂'⦆) := by assumption
 --     -- have ini2 : ⟨α' ∷ ⦅α₁',α₂'⦆,p'⟩ ⊑ pl := sorry  --inisegPL_cons ini'
 --     have := PL_iniseg ish _ _ ini2 ini1

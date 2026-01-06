@@ -15,18 +15,19 @@ inductive isHLFΦ (Φ : SM → Prop) : S → Prop where
   : isHLFΦ Φ (α ∷ ⦅α₁,α₂⦆ ∷ ⦅α₁∷δ,α₂⦆)
 
 -- конверсия в isHLF
--- def isHLFΦ.HLFΦisHLF : (ishlfφ : isHLFΦ Φ α) → isHLF α
--- | .nil => .nil
--- | .cons hlf δ p => .cons hlf.HLFΦisHLF δ δ
--- | .pass hlf δ p => .pass hlf.HLFΦisHLF δ
+def isHLFΦ.HLFΦisHLF : (ishlfφ : isHLFΦ Φ α) → ∃ isp : isPL α, isHLF ⟨α,isp⟩
+| .nil => ⟨_,.nil⟩
+| .cons hlf δ p => ⟨_,.cons hlf.HLFΦisHLF.snd δ δ⟩
+| .pass hlf δ p => ⟨_,.pass hlf.HLFΦisHLF.snd δ⟩
 
 structure HLFΦ (Φ : SM → Prop) where
   s : S
   is_hlfφ : isHLFΦ Φ s
 
 -- конверсия
--- def HLFΦ.toHLF : (hlfφ : HLFΦ Φ) → HLF := λ ⟨s,ishlfφ⟩ ↦ ⟨s,ishlfφ.HLFΦisHLF⟩
--- abbrev HLFΦ.conv : (hlfφ : HLFΦ Φ) → HLF := HLFΦ.toHLF
+def HLFΦ.toHLF : (hlfφ : HLFΦ Φ) → HLF
+| ⟨s,ishlfφ⟩ => ⟨⟨s,ishlfφ.HLFΦisHLF.fst⟩,ishlfφ.HLFΦisHLF.snd⟩
+abbrev HLFΦ.conv : (hlfφ : HLFΦ Φ) → HLF := HLFΦ.toHLF
 
 inductive HLFΦ.Mem : SM → HLFΦ Φ → Prop where
 | elnil : Mem ⦅nil,nil⦆ ⟨_,.nil⟩

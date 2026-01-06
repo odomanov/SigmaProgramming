@@ -12,19 +12,20 @@ inductive isHLFΦ (Φ : SM → SM → Prop) : S → Type where
 | cons : isHLFΦ Φ (α₀ ∷ ⦅α₁,α₂⦆) → (a b : SM) → Φ a b
   → isHLFΦ Φ (α₀ ∷ ⦅α₁,α₂⦆ ∷ ⦅α₁ ∷ a, α₂ ∷ b⦆)
 
--- def isHLFΦ.HLFΦisHLF : (ishlfφ : isHLFΦ Φ α) → isHLF α
--- | .nil => .nil
--- | .cons hlf a b p => .cons hlf.HLFΦisHLF a b
+theorem isHLFΦ.HLFΦisHLF : (ishlfφ : isHLFΦ Φ α) → ∃ isp : isPL α, isHLF ⟨α,isp⟩
+| .nil => ⟨_,.nil⟩
+| .cons hlf a b p => ⟨_,.cons hlf.HLFΦisHLF.snd a b⟩
 
 structure HLFΦ (Φ : SM → SM → Prop) where
   s : S
   is_hlfφ : isHLFΦ Φ s
 
 -- конверсия
--- @[simp]
--- def HLFΦ.toHLF : (hlfφ : HLFΦ Φ) → HLF := λ ⟨s,ishlfφ⟩ ↦ ⟨s,ishlfφ.HLFΦisHLF⟩
--- @[simp]
--- abbrev HLFΦ.conv : (hlf : HLFΦ Φ) → HLF := HLFΦ.toHLF
+@[simp]
+def HLFΦ.toHLF : (hlfφ : HLFΦ Φ) → HLF
+| ⟨s,ishlfφ⟩ => ⟨⟨s,ishlfφ.HLFΦisHLF.fst⟩,ishlfφ.HLFΦisHLF.snd⟩
+@[simp]
+abbrev HLFΦ.conv : (hlf : HLFΦ Φ) → HLF := HLFΦ.toHLF
 
 -- принадлежность
 inductive HLFΦ.Mem : (s : SM) → HLFΦ Φ → Prop where
@@ -80,7 +81,7 @@ theorem HLFΦ_nnil : ∀ (ish : isHLFΦ Φ α),
 -- аксиома Δ₀-выборки
 
 -- функция добавляет все элементы β к hlf₀
-def HLF.choice_fold (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
+def choice_fold (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
   (ish₀ : isHLFΦ Φ (α ∷ ⦅α₁,α₂⦆)) : Σ' (α : S), isHLFΦ Φ α
   := match h : β with
     | .nil => ⟨α ∷ ⦅α₁,α₂⦆,ish₀⟩
@@ -92,13 +93,13 @@ def HLF.choice_fold (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (lis
         exists hα
       choice_fold tl Φ pp (isHLFΦ.cons ish₀ hd δ Φδ)
 
-def HLF.choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
+def choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
   : Σ' (α : S), isHLFΦ Φ α := choice_fold β Φ p .nil
 
 theorem Ax_d0_choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
   : ∃ (α : S) (ish : isHLFΦ Φ α), ∀ {α₁ α₂}, ((⦅α₁, α₂⦆ ∈ (⟨α,ish⟩ : HLFΦ Φ)) →
   ((α₁ = .nil → α₂ = .nil) ∧ (α₁ ≠ .nil → Φ α₁.head α₂.head))) := by
-  let ⟨α,ish⟩ := HLF.choice β Φ p
+  let ⟨α,ish⟩ := choice β Φ p
   exists α, ish
   intro _ _ el
   constructor
