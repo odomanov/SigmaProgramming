@@ -80,23 +80,23 @@ theorem HLFΦ_nnil : ∀ (ish : isHLFΦ Φ α),
 
 -- аксиома Δ₀-выборки
 
--- функция добавляет все элементы β к hlf₀
-def choice_fold (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
+-- функция добавляет все элементы β к ish₀
+def choice_fold (β : S) (Φ : SM → SM → Prop) (p : ∀ α ∈ β, Σ' δ, Φ α δ)
   (ish₀ : isHLFΦ Φ (α ∷ ⦅α₁,α₂⦆)) : Σ' (α : S), isHLFΦ Φ α
   := match h : β with
-    | .nil => ⟨α ∷ ⦅α₁,α₂⦆,ish₀⟩
+    | .nil => ⟨_,ish₀⟩
     | .cons tl hd =>
       let ⟨δ,Φδ⟩ := p hd .here
-      have pp : ∀ α, (α ∈ (list tl)) → Σ' δ, Φ α δ := by
+      have pp : ∀ α, (α ∈ tl) → Σ' δ, Φ α δ := by
         intro α inα
         have ⟨hα,hΦα⟩ := p α (.there inα)
         exists hα
       choice_fold tl Φ pp (isHLFΦ.cons ish₀ hd δ Φδ)
 
-def choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
+def choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α ∈ β, Σ' δ, Φ α δ)
   : Σ' (α : S), isHLFΦ Φ α := choice_fold β Φ p .nil
 
-theorem Ax_d0_choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α, (α ∈ (list β)) → Σ' δ, Φ α δ)
+theorem Ax_d0_choice (β : S) (Φ : SM → SM → Prop) (p : ∀ α ∈ β, Σ' δ, Φ α δ)
   : ∃ (α : S) (ish : isHLFΦ Φ α), ∀ {α₁ α₂}, ((⦅α₁, α₂⦆ ∈ (⟨α,ish⟩ : HLFΦ Φ)) →
   ((α₁ = .nil → α₂ = .nil) ∧ (α₁ ≠ .nil → Φ α₁.head α₂.head))) := by
   let ⟨α,ish⟩ := choice β Φ p
