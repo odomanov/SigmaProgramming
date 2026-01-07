@@ -141,6 +141,9 @@ inductive PL.iniseg : PL → PL → Prop where
 
 scoped notation:min α " ⊑ " β => PL.iniseg α β
 
+scoped instance : Membership SM PL where
+  mem := λ α β => SM.Mem β (list α.s)
+
 
 --== наследственные списочные функции ==--
 

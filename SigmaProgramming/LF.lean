@@ -122,3 +122,70 @@ theorem LF_cond2 (ish : isHLF pl)
             rw [←heq] at hne
             contradiction
     | icons _ _ _ _ h_inner _ _ => exact ih α' α'' h_inner hαp''
+
+-- def pfst (pl : PL) (γ : SM) (el : γ ∈ pl.s) : S := by
+--   revert el
+--   match pl with
+--   | ⟨_, .singl α₁ α₂⟩ =>
+--     intro el
+--     simp [Membership.mem] at el
+--     cases el with
+--     | here =>
+--       simp [S.ORDPAIR] at *
+--       exact α₁
+--   | ⟨_, .cons isp α₁ α₂⟩ =>
+--     intro el
+--     simp [Membership.mem] at el
+--     cases el with
+--     | here =>
+--       simp [S.ORDPAIR] at *
+--       exact α₁
+--     | there el' =>
+--       exact pfst ⟨_, isp⟩ γ el'
+
+def pfst : SM → S
+| list ( cons ( cons nil (list α₁)) (list _)) => α₁
+| _ => nil
+def psnd : SM → S
+| list ( cons ( cons nil (list _)) (list α₂)) => α₂
+| _ => nil
+
+theorem HLF_cond1 (ish : isHLF pl)
+  : ∀ γ ∈ ish.getα, (pfst γ = nil → psnd γ = nil) := by
+  simp only [isHLF.getα]
+  induction ish with
+  | nil =>
+    intro γ el
+    simp [Membership.mem] at el
+    cases he : el with
+    | here => simp [pfst,psnd]
+    | there el' => simp [pfst,psnd]; contradiction
+  | cons ish' a b ih =>
+    intro γ el
+    simp [Membership.mem] at el
+    cases he : el with
+    | here => simp [pfst,psnd]
+    | there el' => simp [pfst,psnd]; exact ih γ el'
+  | pass ish' a ih =>
+    intro γ el
+    simp [Membership.mem] at el
+    cases he : el with
+    | here => simp [pfst,psnd]
+    | there el' => simp [pfst,psnd]; exact ih γ el'
+
+theorem HLF_cond2 (ish : isHLF pl)
+  : ∀ α₁ α₂, (⦅α₁,α₂⦆ ∈ ish.getα ∧ ∃ α₁' a, α₁ = (α₁' ∷ a))
+  → (∃ α₂' b, α₂ = (α₂' ∷ b) ∧ ⦅α₁',α₂'⦆ ∈ ish.getα)
+    ∨ (∃ α₂', α₂ = α₂' ∧ ⦅α₁',α₂'⦆ ∈ ish.getα) := by
+    intro α₁ α₂ x
+    obtain ⟨el,⟨α₁',a,eq⟩ ⟩ := x
+    rw [isHLF.getα] at el
+    cases hp : pl with | mk s isp =>
+
+    injection x at x
+    constructor
+    · and_intros
+
+
+
+  done
