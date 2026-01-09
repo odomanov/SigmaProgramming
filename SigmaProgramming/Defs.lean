@@ -1,6 +1,8 @@
 -- Goncharov S.S.; Sviridenko D.I. - Sigma-Programming. AMS (1989)
 import Mathlib.Tactic
 
+--== теория списочных расширений ==--
+
 namespace GES
 
 class SModel : Type (u + 1) where

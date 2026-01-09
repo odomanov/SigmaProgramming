@@ -139,7 +139,8 @@ theorem Ax_d0_separation' {hlf : HLFΦ Φ} : ⦅nil,α⦆ ∈ hlf → α = nil :
 
 -- всё доказательство
 theorem Ax_d0_separation {hlf : HLFΦ Φ} :
-  (⦅α₀,α₁⦆ ∈ hlf → ⦅α₀ ∷ δ,α₂⦆ ∈ hlf →  ((Φ δ → α₂ = (α₁ ∷ δ)) ∧ (¬ Φ δ → α₂ = α₁)))
+  (⦅α₀,α₁⦆ ∈ hlf → ⦅α₀ ∷ δ,α₂⦆ ∈ hlf
+    →  ((Φ δ → α₂ = (α₁ ∷ δ)) ∧ (¬ Φ δ → α₂ = α₁)))
   ∧ (⦅nil,α⦆ ∈ hlf → α = nil) := by
   constructor
   · intro el1 el2
