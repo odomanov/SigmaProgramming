@@ -25,11 +25,14 @@ mutual
   | atom : M → SM
   | list : S → SM
 end
+#print S.rec
+#print SM.rec
 
 -- Список можно было сделать параметрическим, как это обычно делается,
 -- но будем держаться текста.
 
 open S SM
+#print rec
 
 @[match_pattern]
 infixl:(min+1) " ∷ " => S.cons
