@@ -10,20 +10,14 @@ open S SM
 
 theorem mem_wf : WellFounded SM.Mem := by
   constructor
-  intro s
+  intro sm
   apply SM.rec
-    (motive_1 := fun s => ∀ x ∈ (list s), Acc Mem x)
-    (motive_2 := fun sm => Acc Mem sm)
-  · -- nil
-    nofun
-  · -- cons
-    intro _ _ ih1 ih2 _ h
+    (motive_1 := λ s ↦ ∀ x ∈ (list s), Acc Mem x)
+    (motive_2 := λ sm ↦ Acc Mem sm)
+  · nofun                                     -- nil
+  · intro _ _ ih1 ih2 _ h                     -- cons
     cases h with
-    | here => exact ih2
-    | there el => apply ih1; exact el
-  · -- atom
-    intros; constructor; intro _ h; cases h
-  · -- list
-    intro a ih
-    constructor
-    apply ih
+    | here => apply ih2
+    | there el => apply ih1 _ el
+  · intros; constructor; intro _ h; cases h   -- atom
+  · intro _ ih; constructor; apply ih         -- list
