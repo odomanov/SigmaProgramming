@@ -1,4 +1,4 @@
--- Доказательство фундирования для Mem - нестандартные элиминаторы
+-- Доказательство фундирования для Mem - упрощённые элиминаторы
 import SigmaProgramming.Defs
 
 namespace GES
@@ -14,10 +14,10 @@ theorem S.induction {motive : S → Prop}
   S.rec
     (motive_1 := motive)
     (motive_2 := λ _ ↦ True)
-    nil
-    (λ tl hd ih _ ↦ cons tl hd ih)
-    (λ _ ↦ .intro)
-    (λ _ _ ↦ .intro)
+    (nil  := nil)
+    (cons := λ tl hd ih _ ↦ cons tl hd ih)
+    (atom := λ _ ↦ trivial)
+    (list := λ _ _ ↦ trivial)
 
 @[induction_eliminator]
 theorem SM.induction {motive : SM → Prop}
@@ -27,7 +27,7 @@ theorem SM.induction {motive : SM → Prop}
   SM.rec
     (motive_1 := λ s ↦ ∀ x ∈ (SM.list s), motive x)
     (motive_2 := motive)
-    (nil := nofun)
+    (nil  := nofun)
     (cons := λ _ _ ih1 ih2 _ el ↦ match el with | .here => ih2 | .there el' => ih1 _ el')
     (atom := atom)
     (list := list)

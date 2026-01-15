@@ -1,6 +1,5 @@
 --== Аксиома Ax_d0_separation ==--
 import SigmaProgramming.Defs
-import SigmaProgramming.MemWF
 
 namespace GES
 variable [m : SModel]

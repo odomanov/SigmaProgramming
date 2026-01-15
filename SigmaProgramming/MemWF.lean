@@ -38,14 +38,14 @@ theorem mem_wf₁ : WellFounded SM.Mem := by
 -- ещё способ
 theorem mem_wf₂ : WellFounded SM.Mem :=
   WellFounded.intro (
-  SM.rec
-    (motive_1 := λ s ↦ ∀ x ∈ (list s), Acc Mem x)
-    (motive_2 := λ x ↦ Acc Mem x)
-    nofun                                     -- nil
-    (λ _ _ ih1 ih2 _ h ↦                     -- cons
-      match h with
-      | .here => ih2
-      | .there el => ih1 _ el)
-    (λ _ ↦ Acc.intro _ nofun)               -- atom
-    (λ _ ih ↦ Acc.intro _ ih)               -- list
+    SM.rec
+      (motive_1 := λ s ↦ ∀ x ∈ (list s), Acc Mem x)
+      (motive_2 := λ x ↦ Acc Mem x)
+      nofun                                     -- nil
+      (λ _ _ ih1 ih2 x h ↦                     -- cons
+        match h with
+        | .here => ih2
+        | .there el => ih1 x el)
+      (λ a ↦ Acc.intro (atom a) nofun)               -- atom
+      (λ s ih ↦ Acc.intro (list s) ih)               -- list
   )
