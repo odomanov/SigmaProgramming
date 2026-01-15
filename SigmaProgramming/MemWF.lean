@@ -13,7 +13,7 @@ theorem mem_wf : WellFounded SM.Mem := by
   intro sm
   apply SM.rec
     (motive_1 := λ s ↦ ∀ x ∈ (list s), Acc Mem x)
-    (motive_2 := λ sm ↦ Acc Mem sm)
+    (motive_2 := λ x ↦ Acc Mem x)
   · nofun                                     -- nil
   · intro _ _ ih1 ih2 _ h                     -- cons
     cases h with
@@ -23,7 +23,7 @@ theorem mem_wf : WellFounded SM.Mem := by
   · intro _ ih; constructor; apply ih         -- list
 
 -- другой способ
-theorem mem_wf' : WellFounded SM.Mem := by
+theorem mem_wf₁ : WellFounded SM.Mem := by
   constructor
   intro sm
   induction sm using SM.rec (motive_1 := λ s ↦ ∀ x ∈ (list s), Acc Mem x) with
@@ -34,3 +34,18 @@ theorem mem_wf' : WellFounded SM.Mem := by
     | there el => apply ih1 _ el
   | atom _ => constructor; intro _ h; cases h
   | list _ ih => constructor; apply ih
+
+-- ещё способ
+theorem mem_wf₂ : WellFounded SM.Mem :=
+  WellFounded.intro (
+  SM.rec
+    (motive_1 := λ s ↦ ∀ x ∈ (list s), Acc Mem x)
+    (motive_2 := λ x ↦ Acc Mem x)
+    nofun                                     -- nil
+    (λ _ _ ih1 ih2 _ h ↦                     -- cons
+      match h with
+      | .here => ih2
+      | .there el => ih1 _ el)
+    (λ _ ↦ Acc.intro _ nofun)               -- atom
+    (λ _ ih ↦ Acc.intro _ ih)               -- list
+  )
