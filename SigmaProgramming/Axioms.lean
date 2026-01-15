@@ -17,32 +17,36 @@ theorem Ax_list3 (ne : αs ≠ nil) : (cons (tail αs) (head αs)) = αs := by
 theorem Ax_list4 : tail nil = nil := by trivial
 theorem Ax_list5 : head nil = list nil := by trivial
 theorem Ax_list6 : cons (conc α β) γ = conc α (cons β γ) := by simp_all
+#print Fin.induction
 theorem Ax_list7 : conc (conc α β) γ = conc α (conc β γ) := by
-  induction γ with
+  induction γ using S.rec (motive_2 := λ _ ↦ True) with  -- индукция только по S
   | nil => rfl
   | cons _ _ _ => simp_all
+  | atom _ | list _ _ => trivial
 theorem Ax_list8 : ∀ α, conc nil α = α
-  | .nil => rfl
-  | .cons β _ => by simp_all; cases β <;> apply Ax_list8
+  | nil => rfl
+  | cons β _ => by simp_all; cases β <;> apply Ax_list8
 theorem Ax_list9 : conc α nil = α := rfl
-theorem Ax_induction {Φ : S → Prop} :   --    элиминаторы не стандартные!
+theorem Ax_induction {Φ : S → Prop} :
     Φ nil
   → (∀ α δ, (Φ α → Φ (cons α δ)))
   → (α : S) → Φ α := by
   intro _ h α
-  induction α
-  · assumption
-  · apply h; assumption
+  induction α using S.rec (motive_2 := λ _ ↦ True) with -- индукция только по S
+  | nil => assumption
+  | cons _ _ _ _ => apply h; assumption
+  | atom _ | list _ _ => trivial
 theorem Ax_inductionSM {Φ : SM → Prop} :   -- принцип индукции для SM
     Φ (list nil)
   → (∀ a, Φ (atom a))
   → (∀ α δ, (Φ (list α) → Φ (list (cons α δ))))
   → (α : SM) → Φ α := by
   intro hn ha h α
-  induction α with
-  | atom => exact ha _
-  | listn => exact hn
-  | listc ih1 ih2 ih3 _ => exact h ih1 ih2 ih3
+  induction α using SM.rec (motive_1 := λ s ↦ Φ (list s)) with
+  | nil => apply hn
+  | cons _ _ ih1 _ => apply h; exact ih1
+  | atom _ => apply ha
+  | list _ ih => apply ih
 -- Ax_equality_of_capacity -- см. отдельный файл
 theorem Ax_foundation {Φ : SM → Prop} :
   (∀ δ : SM, ((∀ γ, γ ∈ δ → Φ γ) → Φ δ)) → ∀ α, Φ α := by
