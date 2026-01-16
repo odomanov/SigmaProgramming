@@ -6,7 +6,7 @@ namespace GES
 variable [m : SModel]
 open S SM
 
--- для любой δ существует пара γ, в которой δ будет первым элементом
+-- для любого δ ⊑ β существует пара γ ∈ α, в которой δ будет первым элементом
 theorem LF_cond1 (ish : isHLF pl)
   : ∀ δ, (δ ⊑ ish.getβ) → ∃ γ, (γ ∈ ish.getα) ∧ (∃ ε, ⦅δ,ε⦆ = γ) := by
   induction hi : ish with
@@ -57,6 +57,7 @@ theorem LF_cond1 (ish : isHLF pl)
       obtain ⟨γ, hmem, ⟨ε, heq⟩⟩ := ih ish' rfl δ ini'
       exact ⟨γ,.there hmem, ⟨ε, heq⟩⟩
 
+-- сегменты α упорядочены по ⊑
 theorem LF_cond2 (ish : isHLF pl)
   : ∀ (α' α'' : PL), (α' ⊑ pl) → (α'' ⊑ α')
     → ∃ δ' δ'', (δ' = α'.fst) ∧ (δ'' = α''.fst) ∧ (δ'' ⊑ δ')
@@ -147,7 +148,7 @@ theorem HLF_cond1 (ish : isHLF pl)
     | there el' => exact ih α₁ α₂ el'
 
 theorem HLF_cond2 (ish : isHLF pl)
-  : ∀ α₁' a α₂, ⦅α₁'∷a,α₂⦆ ∈ ish.getα  --∧ ∃ α₁' a, α₁ = (α₁' ∷ a))
+  : ∀ α₁' a α₂, ⦅α₁' ∷ a, α₂⦆ ∈ ish.getα
   → (∃ α₂' b, α₂ = (α₂' ∷ b) ∧ ⦅α₁',α₂'⦆ ∈ ish.getα)
     ∨ (∃ α₂', α₂ = α₂' ∧ ⦅α₁',α₂'⦆ ∈ ish.getα) := by
   simp only [isHLF.getα]

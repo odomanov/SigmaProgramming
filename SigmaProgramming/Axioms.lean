@@ -18,10 +18,9 @@ theorem Ax_list4 : tail nil = nil := by trivial
 theorem Ax_list5 : head nil = list nil := by trivial
 theorem Ax_list6 : cons (conc α β) γ = conc α (cons β γ) := by simp_all
 theorem Ax_list7 : conc (conc α β) γ = conc α (conc β γ) := by
-  induction γ using S.rec (motive_2 := λ _ ↦ True) with  -- индукция только по S
+  cases γ with
   | nil => rfl
-  | cons _ _ _ => simp_all
-  | atom _ | list _ _ => trivial
+  | cons _ _ => simp; apply Ax_list7
 theorem Ax_list8 : ∀ α, conc nil α = α
   | nil => rfl
   | cons β _ => by simp_all; cases β <;> apply Ax_list8
@@ -31,24 +30,21 @@ theorem Ax_induction {Φ : S → Prop} :
   → (∀ α δ, (Φ α → Φ (cons α δ)))
   → (α : S) → Φ α := by
   intro _ h α
-  induction α using S.rec (motive_2 := λ _ ↦ True) with -- индукция только по S
+  induction α with
   | nil => assumption
-  | cons _ _ _ _ => apply h; assumption
-  | atom _ | list _ _ => trivial
+  | cons _ _ _ => apply h; assumption
 theorem Ax_inductionSM {Φ : SM → Prop} :   -- принцип индукции для SM
     Φ (list nil)
   → (∀ a, Φ (atom a))
-  → (∀ α δ, (Φ (list α) → Φ (list (cons α δ))))
+  → (∀ α, ((∀ x ∈ (list α), Φ x) → Φ (list α)))
   → (α : SM) → Φ α := by
-  intro hn ha h α
-  induction α using SM.rec (motive_1 := λ s ↦ Φ (list s)) with
-  | nil => apply hn
-  | cons _ _ ih1 _ => apply h; exact ih1
+  intro hn ha hl α
+  induction α with
   | atom _ => apply ha
-  | list _ ih => apply ih
+  | list s ih => apply hl s ih
 -- Ax_equality_of_capacity -- см. отдельный файл
 theorem Ax_foundation {Φ : SM → Prop} :
-  (∀ δ : SM, ((∀ γ, γ ∈ δ → Φ γ) → Φ δ)) → ∀ α, Φ α := by
+  (∀ δ : SM, ((∀ γ ∈ δ, Φ γ) → Φ δ)) → ∀ α, Φ α := by
   intros
   apply WellFounded.induction mem_wf
   assumption
